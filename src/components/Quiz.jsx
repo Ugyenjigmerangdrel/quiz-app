@@ -1,37 +1,23 @@
 import { useState, useCallback, useRef } from "react";
-import quizCompleteImg from "../assets/quiz-complete.png";
+
 import Question from "./Question.jsx";
 import QUESTIONS from "../questions.js";
+import Summary from "./Summary.jsx";
 
 export default function Quiz() {
   const [userAnswer, setUserAnswer] = useState([]);
-  const [answerState, setAnswerState] = useState("");
-  const activeQuestionIndex =
-    answerState === "" ? userAnswer.length : userAnswer.length - 1;
+  const activeQuestionIndex = userAnswer.length;
 
   const quizIsComplete = activeQuestionIndex === QUESTIONS.length;
 
-  const handleSelectAnswer = useCallback(
-    function handleSelectAnswer(selectedAnswer) {
-      setAnswerState("answered");
-      setUserAnswer((prevAnswer) => {
-        return [...prevAnswer, selectedAnswer];
-      });
-
-      setTimeout(() => {
-        if (selectedAnswer === QUESTIONS[activeQuestionIndex].answers[0]) {
-          setAnswerState("correct");
-        } else {
-          setAnswerState("wrong");
-        }
-
-        setTimeout(() => {
-          setAnswerState("");
-        }, 2000);
-      }, 1000);
-    },
-    [activeQuestionIndex]
-  );
+  const handleSelectAnswer = useCallback(function handleSelectAnswer(
+    selectedAnswer
+  ) {
+    setUserAnswer((prevAnswer) => {
+      return [...prevAnswer, selectedAnswer];
+    });
+  },
+  []);
 
   const handleSkipAnswer = useCallback(
     () => handleSelectAnswer(null),
@@ -39,23 +25,15 @@ export default function Quiz() {
   );
 
   if (quizIsComplete) {
-    return (
-      <div id="summary">
-        <img src={quizCompleteImg} alt="" />
-        <h2>Quiz Completed!</h2>
-      </div>
-    );
+    return <Summary userAnswers={userAnswer} />;
   }
 
   return (
     <div id="quiz">
       <Question
         key={activeQuestionIndex}
-        questionText={QUESTIONS[activeQuestionIndex].text}
-        answers={QUESTIONS[activeQuestionIndex].answers}
+        questionIndex={activeQuestionIndex}
         onSelectAnswer={handleSelectAnswer}
-        answerState={answerState}
-        selectedAnswer={userAnswer[userAnswer.length - 1]}
         onSkipAnswer={handleSkipAnswer}
       />
     </div>
